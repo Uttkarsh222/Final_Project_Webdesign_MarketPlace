@@ -49,36 +49,42 @@ function Signup() {
 
   }
 console.log(process.env.REACT_APP_SERVER_DOMIN)
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-    const { firstName, email, password, confirmPassword } = data;
-    if (firstName && email && password && confirmPassword) {
-      if (password === confirmPassword) {
-    
-          const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMIN}/signup`,{
-            method : "POST",
-            headers : {
-              "content-type" : "application/json"
-            },
-            body : JSON.stringify(data)
-          })
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { firstName, email, password, confirmPassword } = data;
 
-          const dataRes = await fetchData.json()
-    
+  if (firstName && email && password && confirmPassword) {
+    if (password === confirmPassword) {
+      try {
+        const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/signup`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-        // alert(dataRes.message);
-        toast(dataRes.message)
-        if(dataRes.alert){
+        if (!fetchData.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const dataRes = await fetchData.json();
+        toast(dataRes.message);
+        if (dataRes.alert) {
           navigate("/login");
         }
-       
-      } else {
-        alert("password and confirm password not equal");
+
+      } catch (error) {
+        toast.error(`Signup failed: ${error.message}`);
       }
     } else {
-      alert("Please Enter required fields");
+      toast.error("Password and confirm password do not match.");
     }
-  };
+  } else {
+    toast.error("Please enter all required fields.");
+  }
+};
+
 
   return (
     <div className="p-3 md:p-4">

@@ -21,9 +21,6 @@ const Login = () => {
 
   const dispatch = useDispatch()
 
-
-
-
   const handleShowPassword = () => {
     setShowPassword((preve) => !preve);
   };
@@ -37,37 +34,42 @@ const Login = () => {
         }
     })
   }
-
-  const handleSubmit = async(e)=>{
-    e.preventDefault()
-    const {email,password} = data
-    if(email && password ){
-      const fetchData = await fetch(`${process.env.REACT_APP_SERVER_DOMIN}/login`,{
-        method : "POST",
-        headers : {
-          "content-type" : "application/json"
-        },
-        body : JSON.stringify(data)
-      })
-
-      const dataRes = await fetchData.json()
-      console.log(dataRes)
-      
-      toast(dataRes.message)
-      
-      if(dataRes.alert){
-        dispatch(loginRedux(dataRes))
-        setTimeout(() => {
-          navigate("/")
-        }, 1000);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email, password } = data;
+  
+    if (email && password) {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_DOMAIN}/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+  
+        const dataRes = await response.json();
+  
+        if (!response.ok) {
+          throw new Error(dataRes.message || 'Login failed');
+        }
+  
+        if (dataRes.alert) {
+          // Dispatch the user data that is expected by the loginRedux reducer
+          dispatch(loginRedux(dataRes.data)); // Assuming dataRes.data is the user object
+          navigate("/");
+        } else {
+          toast.error(dataRes.message);
+        }
+      } catch (error) {
+        toast.error(error.toString());
       }
-
-      console.log(userData)
+    } else {
+      toast.error("Please enter all required fields.");
     }
-    else{
-        alert("Please Enter required fields")
-    }
-  }
+  };
+  
+  
 
   return (
     <div className="p-3 md:p-4">
