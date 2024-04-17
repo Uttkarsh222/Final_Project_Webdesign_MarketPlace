@@ -14,12 +14,12 @@ export const userSlice = createSlice({
   reducers: {
     loginRedux: (state, action) => {
       console.log(action.payload.data);
-      //   state.user = action.payload.data;
-      state._id = action.payload.data._id;
-      state.firstName = action.payload.data.firstName;
-      state.lastName = action.payload.data.lastName;
-      state.email = action.payload.data.email;
-      state.image = action.payload.data.image;
+      state._id = action.payload._id;
+      state.firstName = action.payload.firstName;
+      state.lastName = action.payload.lastName;
+      state.email = action.payload.email;
+      state.image = action.payload.image;
+  
     },
     logoutRedux: (state, action) => {
       state._id = "";

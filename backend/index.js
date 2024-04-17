@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 //mongodb connection
 mongoose.set("strictQuery", false);
@@ -40,20 +40,21 @@ app.get("/", (req, res) => {
 
 //sign up
 app.post("/signup", async (req, res) => {
-  // console.log(req.body);
   const { email } = req.body;
 
-  userModel.findOne({ email: email }, (err, result) => {
-    // console.log(result);
-    console.log(err);
-    if (result) {
-      res.send({ message: "Email id is already register", alert: false });
-    } else {
-      const data = userModel(req.body);
-      const save = data.save();
-      res.send({ message: "Successfully sign up", alert: true });
+  try {
+    const existingUser = await userModel.findOne({ email: email });
+    if (existingUser) {
+      return res.status(400).send({ message: "Email is already registered", alert: false });
     }
-  });
+
+    const newUser = new userModel(req.body);
+    const savedUser = await newUser.save();
+    res.status(201).send({ message: "Successfully signed up", alert: true, user: savedUser });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ message: "Error signing up", alert: false });
+  }
 });
 
 //api login
